@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/displays")
 public class DisplayController {
     private CurrentConditionDisplay currentConditionDisplay;
+    private StatisticsDisplay statisticsDisplay;
 
-    public DisplayController(CurrentConditionDisplay currentConditionDisplay
-                             ) {
+    public DisplayController(CurrentConditionDisplay currentConditionDisplay,
+                             StatisticsDisplay statisticsDisplay) {
         this.currentConditionDisplay = currentConditionDisplay;
+        this.statisticsDisplay = statisticsDisplay;
     }
 
     @GetMapping
@@ -26,8 +28,11 @@ public class DisplayController {
         html += "<li>";
         html += String.format("<a href=/displays/%s>%s</a>", currentConditionDisplay.id(), currentConditionDisplay.name());
         html += "</li>";
-
+        html += "<li>";
+        html += String.format("<a href=/displays/%s>%s</a>", statisticsDisplay.id(), statisticsDisplay.name());
+        html += "</li>";
         html += "</ul>";
+
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(html);
@@ -40,6 +45,10 @@ public class DisplayController {
         HttpStatus status = HttpStatus.NOT_FOUND;
         if (id.equalsIgnoreCase(currentConditionDisplay.id())) {
             html = currentConditionDisplay.display();
+            status = HttpStatus.FOUND;
+        }
+        else if(id.equalsIgnoreCase(statisticsDisplay.id())){
+            html = statisticsDisplay.display();
             status = HttpStatus.FOUND;
         }
         return ResponseEntity
@@ -55,7 +64,11 @@ public class DisplayController {
             currentConditionDisplay.subscribe();
             html = "Subscribed!";
             status = HttpStatus.FOUND;
-        } else {
+        } else if (id.equalsIgnoreCase(statisticsDisplay.id())) {
+            statisticsDisplay.subscribe();
+            html = "Subscribed!";
+            status = HttpStatus.FOUND;
+        }else {
             html = "The screen id is invalid.";
             status = HttpStatus.NOT_FOUND;
         }
@@ -72,7 +85,11 @@ public class DisplayController {
             currentConditionDisplay.unsubscribe();
             html = "Unsubscribed!";
             status = HttpStatus.FOUND;
-        } else {
+        } else if (id.equalsIgnoreCase(statisticsDisplay.id())) {
+            statisticsDisplay.unsubscribe();
+            html = "Unsubscribed!";
+            status = HttpStatus.FOUND;
+        }else {
             html = "The screen id is invalid.";
             status = HttpStatus.NOT_FOUND;
         }
